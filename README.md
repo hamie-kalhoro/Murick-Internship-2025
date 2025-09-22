@@ -24,5 +24,5 @@ It demonstrates best practices for building a RESTful API using **Spring Boot**,
 - **Spring Data JPA**
 - **MySQL 8+**
 - **Maven**
-https://github.com/your-username/murick-internship-2025.git
+https://github.com/hamie-kalhoro/murick-internship-2025.git
 cd murick-internship-2025
