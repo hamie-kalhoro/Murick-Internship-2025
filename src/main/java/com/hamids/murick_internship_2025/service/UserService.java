@@ -1,44 +1,58 @@
 package com.hamids.murick_internship_2025.service;
 
+import com.hamids.murick_internship_2025.dto.UserRequestDTO;
 import com.hamids.murick_internship_2025.entity.User;
+import com.hamids.murick_internship_2025.dto.UserDTO;
+import com.hamids.murick_internship_2025.mapper.UserMapper;
+import com.hamids.murick_internship_2025.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private Map<Integer, User> userMap = new HashMap<>();
-    private int idCounter = 1;
+    private final UserRepository userRepository;
 
-    public User createUser(User user) {
-        user.setId(idCounter++);
-        userMap.put(user.getId(), user);
-        return user;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public Collection<User> getAllUsers() {
-        return userMap.values();
-    }
-
-    public User getUserById(int id) {
-        return userMap.get(id);
-    }
-
-    public User updateUser(int id, User updatedUser) {
-        if (userMap.containsKey(id)) {
-            updatedUser.setId(id);
-            userMap.put(id, updatedUser);
-            return updatedUser;
+    public UserDTO createUser(UserRequestDTO request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists!");
         }
-        return null;
+        User user = UserMapper.toEntity(request);
+        User saved = userRepository.save(user);
+        return UserMapper.toDTO(saved);
     }
 
-    public boolean deleteUser(int id) {
-        if (userMap.containsKey(id)) {
-            userMap.remove(id);
-            return true;
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public UserDTO getUserById(int id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return UserMapper.toDTO(user);
+    }
+
+    public UserDTO updateUser(int id, UserRequestDTO request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        UserMapper.updateEntity(user, request);
+        User updated = userRepository.save(user);
+        return UserMapper.toDTO(updated);
+    }
+
+    public void deleteUser(int id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found");
         }
-        return false;
+        userRepository.deleteById(id);
     }
 }
 

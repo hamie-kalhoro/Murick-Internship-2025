@@ -1,10 +1,11 @@
 package com.hamids.murick_internship_2025.controller;
 
-import com.hamids.murick_internship_2025.entity.User;
+import com.hamids.murick_internship_2025.dto.UserRequestDTO;
+import com.hamids.murick_internship_2025.dto.UserDTO;
 import com.hamids.murick_internship_2025.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -16,28 +17,28 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    public UserDTO createUser(@RequestBody UserRequestDTO request) {
+        return userService.createUser(request);
     }
 
     @GetMapping
-    public Collection<User> getAllUsers() {
+    public List<UserDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable int id) {
+    public UserDTO getUserById(@PathVariable int id) {
         return userService.getUserById(id);
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable int id, @RequestBody User updatedUser) {
-        return userService.updateUser(id, updatedUser);
+    public UserDTO updateUser(@PathVariable int id, @RequestBody UserRequestDTO request) {
+        return userService.updateUser(id, request);
     }
 
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable int id) {
-        return userService.deleteUser(id) ? "User deleted." : "User not found.";
+        userService.deleteUser(id);
+        return "User deleted.";
     }
 }
-
