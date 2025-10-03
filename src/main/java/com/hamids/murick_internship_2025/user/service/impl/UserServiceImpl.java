@@ -1,27 +1,26 @@
-package com.hamids.murick_internship_2025.service.impl;
+package com.hamids.murick_internship_2025.user.service.impl;
 
-import com.hamids.murick_internship_2025.dto.UserRequestDTO;
-import com.hamids.murick_internship_2025.entity.User;
-import com.hamids.murick_internship_2025.dto.UserDTO;
-import com.hamids.murick_internship_2025.mapper.UserMapper;
-import com.hamids.murick_internship_2025.repository.UserRepository;
-import com.hamids.murick_internship_2025.service.UserService;
+import com.hamids.murick_internship_2025.exception.EmailAlreadyExistsException;
+import com.hamids.murick_internship_2025.user.entity.User;
+import com.hamids.murick_internship_2025.user.dto.UserDTO;
+import com.hamids.murick_internship_2025.user.mapper.UserMapper;
+import com.hamids.murick_internship_2025.user.repository.UserRepository;
+import com.hamids.murick_internship_2025.user.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public UserDTO createUser(UserRequestDTO request) {
+    public UserDTO createUser(UserDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists!");
+            throw new EmailAlreadyExistsException("Email already exists!");
         }
         User user = UserMapper.toEntity(request);
         User saved = userRepository.save(user);
@@ -41,7 +40,7 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toDTO(user);
     }
 
-    public UserDTO updateUser(int id, UserRequestDTO request) {
+    public UserDTO updateUser(int id, UserDTO request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         UserMapper.updateEntity(user, request);
